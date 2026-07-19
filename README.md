@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aero Engineering Website
 
-## Getting Started
+Premium marketing website for **Aero Engineering** (`aeroeng.in`) — manufacturers of Goods Lifts, Dumbwaiters, and custom material-handling elevators.
 
-First, run the development server:
+## Stack
+
+- Next.js (App Router) + React + TypeScript
+- Tailwind CSS + shadcn/ui
+- Framer Motion
+- Lucide icons
+- next-themes (dark mode)
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Configure your company details
 
-## Learn More
+Edit **[`src/lib/site-config.ts`](src/lib/site-config.ts)** — phone, email, WhatsApp, address, social links, and map embed.
 
-To learn more about Next.js, take a look at the following resources:
+## Add your assets
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Drop files into:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Path | Purpose |
+|------|---------|
+| `public/assets/logo/` | Logo SVGs |
+| `public/assets/hero/` | Hero / OG image |
+| `public/assets/products/` | One image per product slug |
+| `public/assets/gallery/` | Gallery images |
+| `public/assets/projects/` | Project thumbnails |
 
-## Deploy on Vercel
+Product image paths are defined in [`src/lib/data/products.ts`](src/lib/data/products.ts).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Pages
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/` — Home
+- `/about` — About Us
+- `/products` — Product listing
+- `/products/[slug]` — Product detail (6 products)
+- `/projects` — Projects (filterable)
+- `/industries` — Industries
+- `/why-choose-us` — Why Choose Us
+- `/gallery` — Gallery with lightbox
+- `/contact` — Contact form (UI-only; ready for API wiring)
+
+## Contact form
+
+The form validates client-side and shows a success state. Wire a backend later where marked `TODO` in [`src/components/sections/contact-form.tsx`](src/components/sections/contact-form.tsx).
