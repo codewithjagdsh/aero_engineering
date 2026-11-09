@@ -1,4 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { neon } from "@neondatabase/serverless";
+import { receiveEvents } from "./inbox.ts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,7 +33,28 @@ export async function POST(request: Request) {
   const expected = createHmac("sha256", secret).update(body).digest();
   const received = Buffer.from(signature.slice(7), "hex");
   if (!timingSafeEqual(expected, received)) return reply("Forbidden", 403);
-  // Do not acknowledge and discard customer messages. Add a durable inbox
-  // and retry-safe worker before enabling the account webhook subscription.
-  return reply("Message processing is not enabled yet", 503);
+  const databaseUrl = process.env.DATABASE_URL;
+  const accountId = process.env.INSTAGRAM_ACCOUNT_ID;
+  if (!databaseUrl || !accountId) return reply("Inbox is not configured", 503);
+  const status = await receiveEvents(body, {
+    accountId,
+    persist: async (events) => {
+      const sql = neon(databaseUrl);
+      // One statement atomically stores the entire delivery. Never log payloads,
+      // database URLs, provider errors, or tokens.
+      await sql`
+        INSERT INTO instagram_inbox (account_id, event_key, customer_id, payload)
+        SELECT account_id, event_key, customer_id, payload
+        FROM jsonb_to_recordset(${JSON.stringify(events.map(event => ({
+          account_id: event.accountId,
+          event_key: event.eventKey,
+          customer_id: event.customerId,
+          payload: event.payload,
+        })))}::jsonb)
+        AS incoming(account_id text, event_key text, customer_id text, payload jsonb)
+        ON CONFLICT (account_id, event_key) DO NOTHING
+      `;
+    },
+  });
+  return reply(status === 200 ? "EVENT_RECEIVED" : "Unable to receive event", status);
 }
