@@ -1,9 +1,12 @@
+import { after } from "next/server.js";
+import { runWorkerSafely } from "../../../../lib/instagram/worker.ts";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { neon } from "@neondatabase/serverless";
 import { receiveEvents } from "./inbox.ts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 function reply(text: string, status = 200) {
   return new Response(text, { status, headers: { "Content-Type": "text/plain", "Cache-Control": "no-store" } });
@@ -56,5 +59,8 @@ export async function POST(request: Request) {
       `;
     },
   });
+  if (status === 200 && process.env.INSTAGRAM_BOT_ENABLED === "true") {
+    after(async () => { await runWorkerSafely(); });
+  }
   return reply(status === 200 ? "EVENT_RECEIVED" : "Unable to receive event", status);
 }
