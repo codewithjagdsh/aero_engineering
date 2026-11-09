@@ -39,7 +39,7 @@ test('only current inbound text for configured account can trigger replies',()=>
 });
 test('send uses bearer token and scoped recipient; accepted response records message ID',async()=>{
  const result=await sendText('456','private-token','123','Hello',async(url,opts)=>{
-  assert.equal(url,'https://graph.instagram.com/v27.0/456/messages');
+  assert.equal(url,'https://graph.facebook.com/v27.0/456/messages');
   assert.equal(opts.headers.Authorization,'Bearer private-token');
   assert.deepEqual(JSON.parse(opts.body),{recipient:{id:'123'},message:{text:'Hello'}});
   return Response.json({message_id:'sent-1'});
