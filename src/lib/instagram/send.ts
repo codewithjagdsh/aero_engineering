@@ -1,7 +1,7 @@
 export type SendResult = {status:'sent'|'failed'|'unknown';messageId?:string;code?:string};
 export async function sendText(accountId:string,token:string,customerId:string,text:string,transport:typeof fetch=fetch):Promise<SendResult> {
   try {
-    const response=await transport(`https://graph.instagram.com/v27.0/${accountId}/messages`,{
+    const response=await transport(`https://graph.facebook.com/v27.0/${accountId}/messages`,{
       method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
       body:JSON.stringify({recipient:{id:customerId},message:{text}}),signal:AbortSignal.timeout(10000),
     });
